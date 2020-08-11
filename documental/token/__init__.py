@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional, Union
 
 from omnilingual import LanguageCode, PartOfSpeech
 from omnilingual.features import Features, NumType
-from .morpheme import Morpheme
 
 
 class Token(object):
@@ -32,7 +31,6 @@ class WordToken(Token):
         lemma: Optional[str] = None,
         pos: PartOfSpeech = PartOfSpeech.Nil,
         tags: List[str] = [],
-        morphemes: Optional[List[Morpheme]] = None,
         features: Features = Features(),
     ):
         super().__init__("Word")
@@ -49,8 +47,6 @@ class WordToken(Token):
         self.pos: PartOfSpeech = pos
         self.tags: List[str] = tags
         self.features: Features = features
-
-        self.morphemes: Optional[List[Morpheme]] = morphemes
 
         self.lexemeIds: List[str] = []
         self.pronounce: Dict[str, Any] = {}
@@ -88,9 +84,6 @@ class WordToken(Token):
         data["pos"] = self.pos.value
         data["tags"] = self.tags
         data["pronounce"] = self.pronounce
-
-        if self.morphemes is not None:
-            data["morphemes"] = [morpheme.dict() for morpheme in self.morphemes]
 
         data["features"] = self.features.dict()
 
