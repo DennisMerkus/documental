@@ -1,93 +1,12 @@
 from __future__ import annotations
 
-import uuid
-
 from typing import Any, Dict, List, Optional, Union
 
-from omnilingual import LanguageCode, PartOfSpeech
-from omnilingual.features import Features, NumType
+from omnilingual import LanguageCode
+from omnilingual.features import NumType
 
-
-class Token(object):
-    def __init__(self, token_type="Token"):
-        self.id: str = str(uuid.uuid1())
-        self.type: str = token_type
-
-    def __iter__(self):
-        yield self
-
-    def as_dict(self) -> Dict[str, Any]:
-        return {"id": self.id, "type": self.type}
-
-    def as_token_dict(self) -> Dict[str, Any]:
-        return {"id": self.id, "type": self.type}
-
-
-class WordToken(Token):
-    def __init__(
-        self,
-        text: str,
-        language: LanguageCode,
-        lemma: Optional[str] = None,
-        pos: PartOfSpeech = PartOfSpeech.Nil,
-        tags: List[str] = [],
-        features: Features = Features(),
-    ):
-        super().__init__("Word")
-
-        self.text: str = text
-
-        self.language = language
-
-        if lemma is not None:
-            self.lemma = lemma
-        else:
-            self.lemma = self.text
-
-        self.pos: PartOfSpeech = pos
-        self.tags: List[str] = tags
-        self.features: Features = features
-
-        self.lexemeIds: List[str] = []
-        self.pronounce: Dict[str, Any] = {}
-
-    def __eq__(self, other):
-        if isinstance(other, WordToken):
-            return (
-                self.text == other.text
-                and self.lemma == other.lemma
-                and self.language == other.language
-                and self.pos == other.pos
-                and self.tags == other.tags
-                and self.features == other.features
-            )
-        else:
-            return False
-
-    def __repr__(self):
-        return "<Word %s:%s:%s:%s:%s:%s>" % (
-            self.text,
-            self.language,
-            self.lemma,
-            str(self.pos),
-            str(self.tags),
-            str(self.features),
-        )
-
-    def as_dict(self) -> Dict[str, Any]:
-        data = super().as_dict()
-
-        data["text"] = self.text
-        data["language"] = self.language.value
-        data["lemma"] = self.lemma
-        data["lexemeIds"] = self.lexemeIds
-        data["pos"] = self.pos.value
-        data["tags"] = self.tags
-        data["pronounce"] = self.pronounce
-
-        data["features"] = self.features.dict()
-
-        return data
+from .token import Token
+from .word import WordToken
 
 
 class Ellision(Token):

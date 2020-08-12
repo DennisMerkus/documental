@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setuptools.setup(
     name="documental",
-    version="0.3.0",
+    version="0.4.0",
     author="Dennis Merkus",
     description="Unified interface for handling different structured document types",
     long_description=long_description,
