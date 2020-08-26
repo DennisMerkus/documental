@@ -1,12 +1,13 @@
 import logging
 from typing import Dict, Optional
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
 from documental import Document
 from documental.html import (
     BareLink,
     Figure,
+    Heading,
     Image,
     Images,
     Link,
@@ -66,12 +67,18 @@ def extract_link(soup: BeautifulSoup, page_url: str) -> Optional[Document]:
 def extract_list(soup: BeautifulSoup) -> UnorderedList:
     document = UnorderedList()
 
-    elements = soup.findAll("li")
-
-    for li in elements:
+    for li in soup.find_all("li"):
         document.add_child(Text(li.get_text()))
 
     return document
+
+
+def extract_heading(soup: BeautifulSoup) -> Heading:
+    heading = Heading(level=int(soup.name[1]))
+
+    heading.add_child(Text(soup.get_text()))
+
+    return heading
 
 
 styles: Dict[str, Style] = {
@@ -87,3 +94,7 @@ styles: Dict[str, Style] = {
 
 def extract_styled_elements(soup: BeautifulSoup) -> StyledText:
     return StyledText(styles[soup.name])
+
+
+def extract_text(soup: NavigableString) -> Text:
+    return Text(soup.string.strip())

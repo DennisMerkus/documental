@@ -128,6 +128,9 @@ class Image(Document):
         self.source: str = source
         self.url: Optional[str] = url
 
+    def __str__(self):
+        return "<Image %s>" % (self.source)
+
     def as_dict(self):
         data = super().as_dict()
 
@@ -166,9 +169,32 @@ class Figure(Container):
         if caption is not None:
             self.add_child(Text(caption))
 
+    def __eq__(self, other):
+        if isinstance(other, Figure):
+            if len(self.children) != len(other.children):
+                return False
+
+            for index in range(len(self.children)):
+                if self.children[index] != other.children[index]:
+                    return False
+
+            return True
+
+        return False
+
+    def __str__(self):
+        return "<Figure [%s]>" % (",".join([str(child) for child in self.children]))
+
 
 class HorizontalRule(Document):
     def __init__(self):
         super().__init__()
 
         self.type = "HorizontalRule"
+
+
+class Breakline(Document):
+    def __init__(self):
+        super().__init__()
+
+        self.type = "Breakline"

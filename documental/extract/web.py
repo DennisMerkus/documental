@@ -4,10 +4,25 @@ from typing import Optional
 from bs4 import BeautifulSoup, NavigableString, Tag
 
 from documental.document import Article, Document, ParentDocument, RootDocument, Section
-from documental.html import Blockquote, Container, Heading, Image, Images, Paragraph
+from documental.html import (
+    Blockquote,
+    Breakline,
+    Container,
+    Heading,
+    Image,
+    Images,
+    Paragraph,
+)
 from documental.text import Text
 
-from .html import extract_figure, extract_link, extract_styled_elements
+from .html import (
+    extract_figure,
+    extract_heading,
+    extract_link,
+    extract_list,
+    extract_styled_elements,
+    extract_text,
+)
 
 
 class WebExtractor(object):
@@ -41,12 +56,7 @@ class WebExtractor(object):
     # TODO: Extract twitter quotes
     def extract_document_soup(self, soup: BeautifulSoup) -> Optional[Document]:
         if type(soup) is NavigableString:
-            text = soup.string.strip()
-
-            if len(text) != 0:
-                return Text(soup.string)
-            else:
-                return None
+            return extract_text(soup)
         elif type(soup) is Tag:
             # TODO: time
             # TODO: ul>li
@@ -83,7 +93,7 @@ class WebExtractor(object):
             elif soup.name == "blockquote":
                 return self.extract_children(soup, Blockquote())
             elif soup.name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
-                return Heading(level=int(soup.name[1])).add_child(Text(soup.get_text()))
+                return extract_heading(soup)
             elif soup.name in ["b", "i", "del", "ins", "em", "u", "small"]:
                 return self.extract_children(soup, extract_styled_elements(soup))
             elif soup.name == "a":
@@ -100,15 +110,13 @@ class WebExtractor(object):
             elif soup.name == "figcaption":
                 return self.extract_children(soup, Container())
             elif soup.name == "br":
-                # Do nothing, will be handled as a new section/tag
-                return None
+                return Breakline()
             elif soup.name == "nav":
                 # Ignore navs for now
                 logging.debug("[Extract] Ignoring nav\n%s" % (soup))
                 return None
-            elif soup.name in ["ul", "li"]:
-                logging.debug("[Extract] Extracting ul/li" % (soup))
-                return self.extract_children(soup, Container())
+            elif soup.name == "ul":
+                return extract_list(soup)
             elif soup.name in ["dl", "ol"]:
                 # Can be a list, but can also be a nav or other styled thing
                 logging.debug("[Extract] Ignoring list\n%s" % (soup))
