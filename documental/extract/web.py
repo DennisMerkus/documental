@@ -43,15 +43,15 @@ class WebExtractor(object):
         return document
 
     def extract_children(
-        self, soup: BeautifulSoup, document: ParentDocument
+        self, soup: BeautifulSoup, parent: ParentDocument
     ) -> ParentDocument:
         for child in soup.children:
             extracted_child = self.extract_document_soup(child)
 
             if extracted_child is not None:
-                document.add_child(extracted_child)
+                parent.add_child(extracted_child)
 
-        return document
+        return parent
 
     # TODO: Extract twitter quotes
     def extract_document_soup(self, soup: BeautifulSoup) -> Optional[Document]:
